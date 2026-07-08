@@ -2,44 +2,66 @@
 
 A static site styled after Google Search and Chrome. Vanilla HTML/CSS/JS, no backend, no API keys. Deployable as-is to GitHub Pages.
 
-## Where the content lives
+## Site structure
 
-Every section's content is plain HTML in its own page. Edit the text there directly.
+Results pages are light and scannable; the depth lives on detail pages you click into. Both the AI Overview links and the blue result titles route to the same detail page.
 
-| File | What it holds |
-|---|---|
-| `index.html` | Homepage (Google home screen): wordmark, search bar, suggestion prompts, shortcut tiles |
-| `about.html` | About Me: bio, beliefs, current roles, plus the knowledge panel with the headshot |
-| `projects.html` | All projects: Knosy, Hackbubu, Evergreen Goodwill, Blue Shield, JPMC (building now), dance app startup, plus the experience timeline panel |
-| `interests.html` | Dance, music and DJing, travel and photography |
-| `skills.html` | Product / Technical / How she works skill lists and the LinkedIn Learning credentials |
-| `contact.html` | Email, LinkedIn, resume links and the get-in-touch panel |
+```
+index.html            Google-style homepage
+about.html            results page: who is maddie?
+projects.html         results page: what experiences does maddie have?
+interests.html        results page: what is maddie interested in?
+skills.html           results page: what are maddie's skills?
+contact.html          results page: how can i contact maddie? (no sub-pages)
+
+projects/             designed case study pages
+  knosy.html          Knosy (Perplexity Agent Build Night winner)
+  hackbubu.html       Hackbubu (SF Tech Week, embeds the pitch video)
+  goodwill.html       Evergreen Goodwill waste diversion (stats + team photos)
+  blueshield.html     Blue Shield maternal care equity (deliverable images)
+  jpmc.html           JPMC Summer Analyst work (building now)
+  dance-app.html      The dance community app (founder, building now)
+
+interests/            photo-forward pages (image placeholders to fill)
+  dance.html          Dance
+  music.html          Music and DJing
+  travel.html         Travel and photography
+
+skills/               skill deep-dives with proof-point chips
+  product.html        Product skills + the LinkedIn Learning credentials card
+  technical.html      Technical skills
+  how-i-work.html     How she works
+```
 
 ## Shared pieces
 
 | File | What it does |
 |---|---|
-| `css/style.css` | All styling: Chrome tab strip, Google colors, search bar, result entries, knowledge panels, responsive rules |
-| `js/chrome.js` | Renders the browser tab strip and toolbar on every page. Tab names and order live in `CHROME_TABS` at the top. Also colors the wordmark and wires AI Overview anchor links |
-| `js/search.js` | Homepage suggestion dropdown (`SEARCH_SUGGESTIONS`) and keyword routing (`KEYWORD_ROUTES`). No AI: plain keyword matching, unmatched queries go to About Me |
-| `site_assets/` | Headshot, resume PDF, project images, pitch video (unchanged from the original site) |
+| `css/style.css` | Chrome tab strip, Google home + results styling, knowledge panels, responsive rules |
+| `css/detail.css` | Detail pages only: case study layout (`.cs-*`), interest galleries (`.gallery`, `.ph` placeholders), skill rows (`.sk-*`) |
+| `js/chrome.js` | Renders the tab strip and toolbar everywhere. Tabs live in `CHROME_TABS`. Detail pages declare `data-root="../"`, `data-parent` (makes the toolbar back arrow work), and `data-path` (shown in the omnibox) |
+| `js/search.js` | Homepage suggestions and keyword routing (results pages only) |
+| `site_assets/` | Headshot, resume PDF, project images, pitch video |
 
-## How the pages are structured
+## Detail page anatomy
 
-Each section page follows the same skeleton, top to bottom:
+Every detail page: Chrome tab strip (section tab stays active, clicking it returns to results), a working toolbar back arrow, a "Back to results" link, an accent color set inline via `--accent` on `<main>`, and a next-page footer link.
 
-1. `<div id="chrome-top">`: the tab strip, injected by `js/chrome.js`. Which tab is active comes from `<body data-tab="...">`.
-2. A results header with the "query" pre-filled. Typing a new query and pressing Enter routes to the closest section.
-3. Decorative results filters (All, Images, Videos, ...).
-4. An AI Overview card. Links inside it scroll to the matching result below and flash it. Anchor ids like `#knosy` sit on each `<article class="result">`.
-5. Google-style result entries: blue title, URL-ish breadcrumb, snippet.
-6. An optional right-side info panel (`<aside class="kpanel">`).
+## Image placeholders to fill (interests pages)
 
-## Editing tips
+Each placeholder is a `<figure class="ph ...">` with a TODO comment above it and the ideal size printed inside. Replace the figure's contents with an `<img>` (keep the `wide`/`half`/`third` class for the grid).
 
-- To add a project, copy one `<article class="result" id="...">` block in `projects.html`, give it a new id, and link the id from the AI Overview paragraph.
-- To rename a tab, edit `CHROME_TABS` in `js/chrome.js` (the file names stay the same unless you also rename the HTML files).
-- The colored wordmark is generated from the `data-text` attribute; change the name in one place per page.
+- `interests/dance.html`: 5 slots (World of Dance 16:9, competition portrait 4:5, Diljit Dosanjh 3:2, rehearsal 3:2, throwback 1:1)
+- `interests/music.html`: 4 slots (DJ decks 16:9, drums 4:5, concert 3:2, classical vocals 3:2)
+- `interests/travel.html`: 5 slots (hero landscape 16:9, portrait 4:5, side quest 3:2, on the road 3:2, square 1:1)
+
+## Other TODOs in the code
+
+- `projects/dance-app.html`: app name, current milestone, screenshots
+- `projects/jpmc.html`: outcomes once the summer wraps
+- `projects/blueshield.html`: replace the paraphrased pull quote if desired
+- `skills/product.html`: proof points for requirements/user stories and sprint ceremonies
+- `skills/technical.html`: proof points for SQL/Python, Figma, Excel
 
 ## Deploying
 

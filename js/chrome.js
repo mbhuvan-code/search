@@ -6,7 +6,15 @@
    Also colours .wordmark elements and wires the AI Overview anchor links.
 
    To rename a section or change tab order, edit CHROME_TABS below.
-   Each page declares which tab is active via <body data-tab="...">.
+
+   Each page declares its context on <body>:
+     data-tab    which tab is active ("home", "about", "projects", ...)
+     data-root   path prefix back to the site root ("" on top-level pages,
+                 "../" on detail pages inside projects/, interests/, skills/)
+     data-parent the section results page a detail page belongs to
+                 (e.g. "projects.html"); makes the toolbar back arrow work
+     data-path   clean path shown in the omnibox on detail pages
+                 (e.g. "projects/knosy")
    ========================================================================== */
 
 const CHROME_TABS = [
@@ -34,31 +42,46 @@ const ICONS = {
 function renderChromeTop() {
   const mount = document.getElementById("chrome-top");
   if (!mount) return;
-  const active = document.body.dataset.tab || "home";
+  const body = document.body;
+  const active = body.dataset.tab || "home";
+  const root = body.dataset.root || "";
+  const parent = body.dataset.parent || "";
+  const path = body.dataset.path || "";
   const current = CHROME_TABS.find(t => t.id === active) || CHROME_TABS[0];
 
   const tabsHtml = CHROME_TABS.map(t => `
-    <a class="tab${t.id === active ? " active" : ""}" href="${t.href}" title="${t.title}">
+    <a class="tab${t.id === active ? " active" : ""}" href="${root}${t.href}" title="${t.title}">
       ${ICONS.star}
       <span class="tab-title">${t.title}</span>
       <span class="tab-close" data-decorative>${ICONS.close}</span>
     </a>`).join("");
 
-  const omni = current.q
-    ? `${ICONS.lock}<span>google.com/search?q=${current.q.replace(/ /g, "+")}</span>`
-    : `${ICONS.lock}<span>Ask Google or type a URL</span>`;
+  // Detail pages show their clean path; section pages show the fake query URL.
+  let omni;
+  if (path) {
+    omni = `${ICONS.lock}<span>mbhuvan-code.github.io/search/${path}</span>`;
+  } else if (current.q) {
+    omni = `${ICONS.lock}<span>google.com/search?q=${current.q.replace(/ /g, "+")}</span>`;
+  } else {
+    omni = `${ICONS.lock}<span>Ask Google or type a URL</span>`;
+  }
+
+  // On detail pages the toolbar back arrow really navigates back to results.
+  const backBtn = parent
+    ? `<a class="tb-btn" href="${root}${parent}" title="Back to results">${ICONS.back}</a>`
+    : `<span class="tb-btn">${ICONS.back}</span>`;
 
   mount.innerHTML = `
     <div class="tabstrip">
       <div class="win-dots" aria-hidden="true"><span class="r"></span><span class="y"></span><span class="g"></span></div>
       <div class="tabs">${tabsHtml}</div>
-      <button class="new-tab" type="button" title="New tab" onclick="location.href='index.html'">${ICONS.plus}</button>
+      <button class="new-tab" type="button" title="New tab" onclick="location.href='${root}index.html'">${ICONS.plus}</button>
     </div>
     <div class="toolbar">
-      <span class="tb-btn">${ICONS.back}</span>
+      ${backBtn}
       <span class="tb-btn">${ICONS.fwd}</span>
       <span class="tb-btn">${ICONS.reload}</span>
-      <div class="omnibox${current.q ? "" : " empty"}">${omni}</div>
+      <div class="omnibox${current.q || path ? "" : " empty"}">${omni}</div>
       <span class="tb-btn">${ICONS.star.replace('class="tab-fav" ', "").replace('fill="#F4B400"', 'fill="#5f6368" width="16" height="16"')}</span>
       <span class="tb-avatar">M</span>
     </div>`;
@@ -82,7 +105,7 @@ function paintWordmarks() {
   });
 }
 
-/* AI Overview links: smooth-scroll to the matching result and flash it */
+/* Same-page anchor links: smooth-scroll to the target and flash it */
 function wireAnchorLinks() {
   document.addEventListener("click", e => {
     const a = e.target.closest('a[href^="#"]');
