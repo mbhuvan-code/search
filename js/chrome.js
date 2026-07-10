@@ -66,10 +66,10 @@ function renderChromeTop() {
     omni = `${ICONS.lock}<span>Ask Google or type a URL</span>`;
   }
 
-  // On detail pages the toolbar back arrow really navigates back to results.
-  const backBtn = parent
-    ? `<a class="tb-btn" href="${root}${parent}" title="Back to results">${ICONS.back}</a>`
-    : `<span class="tb-btn">${ICONS.back}</span>`;
+  // The toolbar back arrow behaves like the real browser back button.
+  // With no history (direct landing), it falls back to the parent
+  // results page on detail pages, or the homepage elsewhere.
+  const backBtn = `<button class="tb-btn" id="tb-back" type="button" title="Back">${ICONS.back}</button>`;
 
   mount.innerHTML = `
     <div class="tabstrip">
@@ -89,6 +89,11 @@ function renderChromeTop() {
   // The "x" on each tab is decorative: swallow the click so it does not navigate.
   mount.querySelectorAll("[data-decorative]").forEach(el => {
     el.addEventListener("click", e => { e.preventDefault(); e.stopPropagation(); });
+  });
+
+  mount.querySelector("#tb-back").addEventListener("click", () => {
+    if (history.length > 1) history.back();
+    else location.href = root + (parent || "index.html");
   });
 }
 

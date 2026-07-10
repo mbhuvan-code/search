@@ -13,15 +13,6 @@
   max-width:960px;margin:0 auto;padding:12px 28px 70px;
 }
 
-/* Back-to-results row */
-.back-link{
-  display:inline-flex;align-items:center;gap:8px;margin:20px 0 0;
-  font:500 14px var(--font-ui);color:#5f6368;text-decoration:none;
-  padding:7px 14px 7px 10px;border-radius:999px;
-}
-.back-link:hover{background:var(--chip-bg);color:var(--text)}
-.back-link svg{flex:0 0 auto}
-
 /* Four Google dots, used as a section divider motif */
 .g-dots{display:flex;gap:8px;margin:22px 0}
 .g-dots span{width:9px;height:9px;border-radius:50%}
@@ -163,8 +154,15 @@
 .ph .ph-what{font:500 13.5px var(--font-ui);color:var(--text-soft);max-width:24em}
 .ph .ph-spec{font:400 11.5px var(--font-ui);color:#9aa0a6}
 
-/* Real images dropped into the gallery */
-.gallery img{width:100%;height:100%;object-fit:cover;border-radius:16px;display:block}
+/* Real images dropped into the gallery.
+   Put the aspect class on the <img> so the caption can sit below it. */
+.gallery img{width:100%;object-fit:cover;border-radius:16px;display:block}
+.gallery img.r169{aspect-ratio:16/9}
+.gallery img.r43{aspect-ratio:4/3}
+.gallery img.r32{aspect-ratio:3/2}
+.gallery img.r45{aspect-ratio:4/5}
+.gallery img.r11{aspect-ratio:1/1}
+.gallery img.r916{aspect-ratio:9/16}
 figure.shot{margin:0;position:relative}
 figure.shot figcaption{margin-top:7px;font-size:12.5px;color:var(--text-faint)}
 
