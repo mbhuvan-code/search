@@ -20,7 +20,7 @@ projects/             designed case study pages
   goodwill.html       Evergreen Goodwill waste diversion (stats + team photos)
   blueshield.html     Blue Shield maternal care equity (deliverable images)
   jpmc.html           JPMC Summer Analyst work (building now)
-  dance-app.html      The dance community app (founder, building now)
+  dance-app.html      DancerBase, the dance community app (founder, building now)
 
 interests/            photo-forward pages (image placeholders to fill)
   dance.html          Dance
