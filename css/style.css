@@ -16,11 +16,23 @@
   --line:#dadce0;
   --line-soft:#ebebeb;
   --chip-bg:#f1f3f4;
-  --strip-bg:#dee1e6;
   --flash:#e8f0fe;
   --font-ui:'Roboto',Arial,sans-serif;
   --font-body:Arial,'Roboto',sans-serif;
   --font-logo:'Poppins','Product Sans',Arial,sans-serif;
+  /* Source panel: 380px when it fits, easing down to 300px before anything
+     else has to give. */
+  --panel-w:clamp(300px, calc(100vw - 980px), 380px);
+  /* Left edge shared by the search bar, nav row, results column, and source
+     panel in every state. The wordmark never affects it.
+
+     The content block is 652px results + 48px gap + the panel, so centering
+     it puts (100vw - 700px - panel) / 2 on each side. The right margin is
+     left to fall out of the leftover grid space, which lands on that same
+     value, so the gutters read as equal (like Google's).
+     The 28px floor matches the right padding, keeping the two sides equal
+     down to the compact breakpoint. */
+  --results-left:max(28px, calc((100vw - 700px - var(--panel-w)) / 2));
 }
 
 *{box-sizing:border-box}
@@ -33,87 +45,10 @@ body{
 a{color:inherit}
 img{max-width:100%;display:block}
 h1,h2,h3,h4{margin:0;font-weight:400}
+[hidden]{display:none!important}
 
 /* ==========================================================================
-   Chrome window: tab strip + toolbar (injected by js/chrome.js)
-   ========================================================================== */
-
-.chrome-top{position:sticky;top:0;z-index:100}
-
-.tabstrip{
-  display:flex;align-items:flex-end;gap:0;
-  background:var(--strip-bg);
-  padding:10px 10px 0 14px;
-}
-.win-dots{display:flex;gap:8px;align-self:center;margin:0 14px 6px 0;flex:0 0 auto}
-.win-dots span{width:12px;height:12px;border-radius:50%}
-.win-dots .r{background:#ff5f57}
-.win-dots .y{background:#febc2e}
-.win-dots .g{background:#28c840}
-
-.tabs{display:flex;align-items:flex-end;min-width:0;overflow-x:auto;scrollbar-width:none}
-.tabs::-webkit-scrollbar{display:none}
-
-.tab{
-  position:relative;display:flex;align-items:center;gap:8px;
-  flex:0 1 190px;min-width:120px;height:36px;
-  padding:0 8px 0 12px;
-  border-radius:12px 12px 0 0;
-  font:500 12.5px/1 var(--font-ui);color:#45494d;
-  text-decoration:none;white-space:nowrap;
-}
-.tab:not(.active):hover{background:rgba(255,255,255,.5)}
-.tab.active{background:#fff;color:var(--text);z-index:2}
-/* Concave curves where the active tab meets the toolbar */
-.tab.active::before,
-.tab.active::after{content:"";position:absolute;bottom:0;width:12px;height:12px}
-.tab.active::before{left:-12px;background:radial-gradient(circle at 0 0,transparent 11.5px,#fff 12px)}
-.tab.active::after{right:-12px;background:radial-gradient(circle at 100% 0,transparent 11.5px,#fff 12px)}
-/* Thin divider between neighbouring background tabs */
-.tab:not(.active)+.tab:not(.active)::before{
-  content:"";position:absolute;left:0;top:9px;bottom:9px;width:1px;background:#b6bac0;
-}
-.tab-fav{flex:0 0 auto}
-.tab-title{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}
-.tab-close{
-  flex:0 0 auto;width:16px;height:16px;border-radius:50%;
-  display:flex;align-items:center;justify-content:center;color:#5f6368;
-}
-.tab-close:hover{background:rgba(0,0,0,.1)}
-.new-tab{
-  flex:0 0 auto;width:28px;height:28px;margin:0 0 4px 6px;border:0;border-radius:50%;
-  background:transparent;color:#45494d;display:flex;align-items:center;justify-content:center;cursor:pointer;
-}
-.new-tab:hover{background:rgba(255,255,255,.55)}
-
-.toolbar{
-  display:flex;align-items:center;gap:6px;
-  background:#fff;padding:7px 14px;border-bottom:1px solid var(--line-soft);
-}
-.tb-btn{
-  width:32px;height:32px;border-radius:50%;flex:0 0 auto;
-  display:flex;align-items:center;justify-content:center;color:#5f6368;
-  border:0;background:transparent;padding:0;
-}
-button.tb-btn{cursor:pointer}
-.tb-btn:hover{background:var(--chip-bg)}
-.omnibox{
-  flex:1;min-width:0;height:34px;margin:0 8px;
-  background:var(--chip-bg);border-radius:999px;
-  display:flex;align-items:center;gap:9px;padding:0 16px;
-  font:400 13.5px var(--font-ui);color:var(--text);
-  overflow:hidden;white-space:nowrap;
-}
-.omnibox.empty{color:#80868b}
-.tb-avatar{
-  width:26px;height:26px;border-radius:50%;flex:0 0 auto;
-  background:#e8710a;color:#fff;
-  display:flex;align-items:center;justify-content:center;
-  font:500 13px var(--font-ui);
-}
-
-/* ==========================================================================
-   Multi-colour wordmark (letters coloured by js/chrome.js)
+   Multi-colour wordmark (letters coloured by js/app.js)
    ========================================================================== */
 
 .wordmark{font-family:var(--font-logo);font-weight:500;letter-spacing:-.03em}
@@ -157,11 +92,12 @@ button.tb-btn{cursor:pointer}
   font:400 16px var(--font-body);color:var(--text);
 }
 .sb-icon{flex:0 0 auto;display:flex;align-items:center;justify-content:center;width:28px;height:28px;color:#9aa0a6}
-.ai-mode-pill{
-  flex:0 0 auto;display:flex;align-items:center;gap:7px;
-  border:1px solid var(--line);border-radius:999px;background:#fff;
-  padding:8px 14px;font:500 13.5px var(--font-ui);color:#1f1f1f;white-space:nowrap;
+.sb-clear{
+  flex:0 0 auto;width:28px;height:28px;border:0;background:transparent;padding:0;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:50%;
 }
+.sb-clear:hover{background:var(--chip-bg)}
+.sb-sep{flex:0 0 auto;width:1px;height:26px;background:#dfe1e5}
 
 .suggestions{
   display:none;position:absolute;top:100%;left:0;right:0;z-index:40;
@@ -178,8 +114,9 @@ button.tb-btn{cursor:pointer}
 .suggestion:hover{background:var(--chip-bg)}
 .suggestion .sb-icon{width:20px;height:20px}
 
-/* Shortcut tiles */
+/* Shortcut tiles (hidden while the suggestion dropdown is open) */
 .shortcuts{display:flex;justify-content:center;flex-wrap:wrap;gap:14px 26px;margin-top:70px}
+.home-center:has(.searchbox.open) .shortcuts{visibility:hidden}
 .shortcut{width:96px;text-decoration:none;color:var(--text);font-size:13px;text-align:center}
 .shortcut .disc{
   width:56px;height:56px;margin:0 auto 8px;border-radius:50%;
@@ -194,17 +131,26 @@ button.tb-btn{cursor:pointer}
    ========================================================================== */
 
 .results-header{
-  display:flex;align-items:center;gap:26px;
-  padding:24px 28px 0;
+  position:relative;display:flex;align-items:center;gap:26px;
+  padding:24px 28px 0 var(--results-left);
 }
-.mini-logo{font-size:27px;text-decoration:none;flex:0 0 auto;line-height:1}
+/* Wordmark floats in the left gutter, centered on the search bar */
+.mini-logo{
+  position:absolute;left:28px;top:24px;height:44px;
+  display:flex;align-items:center;
+  font-size:27px;text-decoration:none;line-height:1;white-space:nowrap;
+}
 .results-header .searchbox{margin:0;flex:0 1 660px}
+.sb-fav{
+  display:none;flex:0 0 auto;width:26px;height:26px;border-radius:50%;
+  background:var(--chip-bg);align-items:center;justify-content:center;
+}
 .results-header .searchbox-inner{min-height:44px;box-shadow:0 1px 6px rgba(32,33,36,.18);border-color:transparent}
 .header-icons{display:flex;align-items:center;gap:14px;margin-left:auto;flex:0 0 auto}
 
 .results-nav{
   display:flex;gap:26px;align-items:flex-end;
-  padding:18px 28px 0;margin-left:184px;
+  padding:18px 28px 0 var(--results-left);
   border-bottom:1px solid var(--line-soft);
   font:400 14px var(--font-ui);color:#5f6368;
   overflow-x:auto;scrollbar-width:none;
@@ -215,30 +161,112 @@ button.tb-btn{cursor:pointer}
   padding:0 2px 10px;text-decoration:none;color:#5f6368;white-space:nowrap;
   border-bottom:3px solid transparent;
 }
-.results-nav a.on{color:var(--text);font-weight:500;border-bottom-color:#1a73e8}
+.results-nav a.on{color:#202124;font-weight:500;border-bottom-color:#202124}
 .results-nav a:not(.on):hover{color:var(--text)}
 
-.results-count{margin:14px 28px 0 212px;font-size:13px;color:var(--text-faint)}
+.results-count{margin:14px 28px 0 var(--results-left);font-size:13px;color:var(--text-faint)}
 
+/* Two columns: capped results column left, source panel + knowledge panel
+   right. Both top cells (AI Overview | sources) start the grid. */
 .results-layout{
-  display:flex;gap:52px;align-items:flex-start;
-  padding:6px 28px 30px 212px;
+  display:grid;column-gap:48px;align-items:start;
+  grid-template-columns:minmax(0,652px) var(--panel-w);
+  grid-template-areas:"overview sources" "results rail";
+  padding:6px 28px 30px var(--results-left);
 }
-.results-main{flex:0 1 652px;min-width:0}
+.results-main{grid-area:results;min-width:0;max-width:652px}
 
-/* AI Overview card */
-.ai-overview{
-  margin-top:22px;border:1px solid #e3e7ef;border-radius:18px;
-  padding:20px 24px 22px;
-  background:linear-gradient(160deg,#fdfdff,#f7f9ff 70%);
+/* AI Overview: no container, sits on white; divider below, above results */
+.ai-overview{grid-area:overview;margin-top:22px;padding-bottom:16px;border-bottom:1px solid var(--line-soft)}
+.ai-ov-head{display:flex;align-items:center;gap:10px;font:500 16px var(--font-ui);color:#1f1f1f;margin-bottom:14px}
+.ai-ov-menu{margin-left:auto;flex:0 0 auto}
+.ai-ov-body{position:relative}
+.ai-overview.collapsed .ai-ov-body{max-height:400px;overflow:hidden}
+.ai-overview.collapsed .ai-ov-body::after{
+  content:"";position:absolute;left:0;right:0;bottom:0;height:60px;
+  background:linear-gradient(rgba(255,255,255,0),#fff);pointer-events:none;
 }
-.ai-ov-head{display:flex;align-items:center;gap:10px;font:500 16px var(--font-ui);color:#1f1f1f;margin-bottom:12px}
-.ai-overview p{margin:0 0 12px;font-size:15.5px;line-height:1.65;color:#1f1f1f}
-.ai-overview p:last-child{margin-bottom:0}
+.ai-ov-body p{margin:0 0 12px;font-size:16px;line-height:1.5;color:#1f1f1f}
+.ai-ov-sub{margin:18px 0 10px;font:500 18px var(--font-ui);color:#1f1f1f}
+.ai-ov-list{margin:0 0 12px;padding-left:24px}
+.ai-ov-list li{font-size:16px;line-height:1.5;color:#1f1f1f;margin-bottom:10px}
 .ai-overview a{
-  color:var(--link);text-decoration:none;border-bottom:1px solid #c6dafc;
+  color:#1a73e8;text-decoration:underline;
+  background:var(--flash);border-radius:4px;padding:0 2px;
 }
-.ai-overview a:hover{background:var(--flash)}
+.ai-overview a:hover{background:#d2e3fc}
+/* Inline citation chip: first source's favicon + name + remaining count.
+   Filled by js/app.js from the same data that renders the source panel. */
+.cite-chip{
+  display:inline-flex;align-items:center;gap:6px;vertical-align:middle;
+  margin-left:6px;border:0;cursor:pointer;
+  background:var(--chip-bg);border-radius:999px;padding:3px 10px 3px 4px;
+  font:400 12px var(--font-ui);color:#444746;
+}
+.cite-chip:hover{background:#e8eaed}
+.cc-fav{
+  width:18px;height:18px;border-radius:50%;overflow:hidden;flex:0 0 auto;
+  background:#fff;display:flex;align-items:center;justify-content:center;
+}
+.cc-count{color:#5f6368}
+/* Inline source list the chip expands to */
+.cite-list{
+  margin:10px 0 16px;border:1px solid var(--line);border-radius:14px;
+  padding:2px 18px;background:#fff;
+}
+/* Entries keep panel styling, not the overview's highlighted-link styling */
+.cite-list .src-title{background:transparent;padding:0;border-radius:0;text-decoration:none;color:#1f1f1f}
+.cite-list .src-title:hover{background:transparent;text-decoration:underline}
+.ai-ov-more{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  width:100%;height:42px;margin-top:6px;
+  background:#fff;border:1px solid #dadce0;border-radius:999px;
+  font:400 14px var(--font-ui);color:#1f1f1f;cursor:pointer;
+}
+.ai-ov-more:hover{background:#f8f9fa}
+.ai-ov-disclaimer{margin:12px 0 0;font:400 12px var(--font-ui);color:#70757a}
+
+/* Source panel beside the AI Overview */
+.ai-sources{
+  grid-area:sources;position:relative;margin-top:22px;
+  border:1px solid var(--line);border-radius:14px;background:#fff;
+  padding:2px 18px 12px;
+}
+/* Height is set inline by js/app.js from the AI Overview's height, so the
+   card never runs past it (420px is only a pre-JS fallback). The list
+   scrolls inside that box. */
+.src-list{max-height:420px;overflow-y:auto;scrollbar-width:thin}
+/* Fade whenever the list is cut off; it lifts at the last source. */
+.ai-sources.clipped:not(.at-end)::after{
+  content:"";position:absolute;left:1px;right:1px;bottom:12px;height:56px;
+  background:linear-gradient(rgba(255,255,255,0),#fff);pointer-events:none;
+}
+/* Compact mode: js/app.js moves the panel inside the AI Overview, where the
+   overview's own Show more reveals it. The full list shows (no clip, no
+   scrolling, no fade) and entries keep panel styling, not overview-link
+   styling. Hidden until the overview is opened. */
+.ai-overview.folded .ai-sources{display:none}
+.ai-overview .ai-sources{margin:18px 0 6px}
+.ai-overview .ai-sources .src-list{max-height:none!important;overflow:visible}
+.ai-overview .ai-sources::after{content:none}
+.ai-overview .ai-sources .src-title{background:transparent;padding:0;border-radius:0;text-decoration:none;color:#1f1f1f}
+.ai-overview .ai-sources .src-title:hover{background:transparent;text-decoration:underline}
+.src{padding:14px 0;border-bottom:1px solid var(--line-soft)}
+.src:last-child{border-bottom:0}
+.src-head{display:flex;align-items:center;gap:8px;font:400 12px var(--font-ui);color:#5f6368;margin-bottom:7px}
+.src-fav{width:18px;height:18px;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.src-row{display:flex;gap:12px}
+.src-text{flex:1;min-width:0}
+.src-title{
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  font:500 14px var(--font-ui);color:#1f1f1f;text-decoration:none;line-height:1.35;
+}
+.src-title:hover{text-decoration:underline}
+.src-snippet{
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  margin:5px 0 0;font:400 12px var(--font-ui);color:#70757a;line-height:1.4;
+}
+.src-thumb{flex:0 0 64px;width:64px;height:64px;border-radius:12px;object-fit:cover}
 
 /* Search result entries */
 .result{margin-top:32px;scroll-margin-top:120px}
@@ -248,21 +276,29 @@ button.tb-btn{cursor:pointer}
   100%{background:transparent}
 }
 .result-crumb{display:flex;align-items:center;gap:12px}
+.r-menu{flex:0 0 auto;margin-left:auto;color:#5f6368;display:flex;align-items:center}
 .fav-disc{
   width:26px;height:26px;border-radius:50%;flex:0 0 auto;
   background:var(--chip-bg);border:1px solid #ecedef;
   display:flex;align-items:center;justify-content:center;
 }
 .crumb-text{min-width:0;line-height:1.3}
-.crumb-text .site{display:block;font-size:14px;color:var(--text)}
-.crumb-text .url{display:block;font-size:12px;color:var(--text-soft);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.crumb-text .site{display:block;font-size:14px;color:#202124}
+.crumb-text .url{display:block;font-size:14px;color:#202124;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .result h3{margin:5px 0 0;font-size:20px;line-height:1.3}
 .result h3 a{color:var(--link);text-decoration:none}
 .result h3 a:hover{text-decoration:underline}
 .result h3 a:visited{color:#681da8}
 .result .meta{margin:3px 0 0;font-size:13px;color:var(--text-faint)}
-.snippet{margin:6px 0 0;font-size:14px;color:var(--text-soft)}
+.snippet{margin:6px 0 0;font-size:14px;line-height:1.58;color:#4d5156}
 .snippet b{color:var(--text);font-weight:700}
+/* Related-search chips under results with sub-topics */
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.chip{
+  border:1px solid var(--line);border-radius:999px;padding:7px 14px;
+  font:400 13px var(--font-ui);color:var(--link);text-decoration:none;white-space:nowrap;
+}
+.chip:hover{background:#f8f9fa}
 .snippet-list{margin:8px 0 0;padding:0 0 0 2px;list-style:none}
 .snippet-list li{
   font-size:14px;color:var(--text-soft);padding:3.5px 0 3.5px 0;
@@ -280,10 +316,17 @@ button.tb-btn{cursor:pointer}
 
 /* Right-side info panel (knowledge panel) */
 .kpanel{
-  flex:0 0 360px;max-width:360px;margin-top:22px;
+  grid-area:rail;margin-top:26px;
   border:1px solid var(--line);border-radius:14px;overflow:hidden;
 }
-.kpanel-img{width:100%;height:270px;object-fit:cover}
+/* Portrait source (900x1260). A fixed pixel height would re-crop the photo
+   at every panel width — badly once the panel goes full width — so the box
+   keeps a constant aspect ratio and the crop stays identical everywhere.
+   The 30% vertical anchor keeps headroom above the hair. */
+.kpanel-img{
+  width:100%;height:auto;aspect-ratio:4/3;max-height:400px;
+  object-fit:cover;object-position:center 30%;
+}
 .kpanel-body{padding:18px 22px 22px}
 .kpanel-body h2{font-size:26px;line-height:1.2}
 .kpanel-body .sub{margin:2px 0 0;font-size:14px;color:var(--text-faint)}
@@ -313,29 +356,35 @@ button.tb-btn{cursor:pointer}
    Responsive
    ========================================================================== */
 
-@media(max-width:1120px){
-  .kpanel{flex:0 0 300px}
+/* Below ~1280px a centered block leaves a gutter too narrow to hold the
+   wordmark, so it gives way to the favicon inside the search bar (Google
+   swaps its logo the same way) and the gutters stay equal. */
+@media(max-width:1279px){
+  .mini-logo{display:none}
+  .sb-fav{display:flex}
 }
-@media(max-width:980px){
-  .results-layout{flex-direction:column;padding-left:28px}
-  .results-nav{margin-left:0}
-  .results-count{margin-left:28px}
-  .kpanel{flex:none;width:100%;max-width:652px}
-  .kpanel-img{height:230px}
+
+@media(max-width:999px){
+  /* Compact mode: no wordmark, no source panel; the star favicon inside the
+     search bar and the inline citation chip take their places. */
+  :root{--results-left:24px}
+  .mini-logo{display:none}
+  .sb-fav{display:flex}
+  .results-header{gap:14px;padding-top:16px;padding-right:24px}
+  .results-header .searchbox{flex:1 1 auto}
+  .results-layout{
+    grid-template-columns:minmax(0,1fr);
+    grid-template-areas:"overview" "results" "rail";
+    padding-right:24px;
+  }
+  .results-main{max-width:none}
+  .kpanel{width:100%;max-width:652px}
 }
 @media(max-width:700px){
-  .tab{min-width:104px;flex-basis:150px}
-  .tab-close{display:none}
-  .results-header{gap:14px;padding:16px 16px 0;flex-wrap:wrap}
-  .mini-logo{font-size:23px}
-  .results-header .searchbox{flex:1 1 100%;order:3}
   .header-icons{margin-left:auto}
-  .results-nav,.results-count{padding-left:16px}
-  .results-layout{padding:6px 16px 30px}
   .home-center{padding-top:6vh}
   .shortcuts{gap:8px 10px}
   .shortcut{width:82px}
-  .ai-mode-pill span{display:none}
   .result-thumb{flex-basis:76px;width:76px;height:76px}
   .home-footer{position:static}
 }

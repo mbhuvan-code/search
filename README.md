@@ -1,18 +1,21 @@
-# Maddie Bhuvan, PM intern portfolio (Google/Chrome edition)
+# Maddie Bhuvan, PM intern portfolio (Google Search edition)
 
-A static site styled after Google Search and Chrome. Vanilla HTML/CSS/JS, no backend, no API keys. Deployable as-is to GitHub Pages.
+A static site styled after Google Search. Vanilla HTML/CSS/JS, no backend, no API keys. Deployable as-is to GitHub Pages.
+
+The five sections are one single-page app (`index.html`): each section lives at a real, shareable URL (`?q=who+is+maddie`, `?q=what+are+maddies+skills`, ...), the browser tab title reads like a Google search ("who is maddie? - Google Search"), and back/forward move between sections via `history.pushState`. Hosted at `mbhuvan-code.github.io/search/`, the address bar reads like a search URL.
 
 ## Site structure
 
 Results pages are light and scannable; the depth lives on detail pages you click into. Both the AI Overview links and the blue result titles route to the same detail page.
 
 ```
-index.html            Google-style homepage
-about.html            results page: who is maddie?
-projects.html         results page: what experiences does maddie have?
-interests.html        results page: what is maddie interested in?
-skills.html           results page: what are maddie's skills?
-contact.html          results page: how can i contact maddie? (no sub-pages)
+index.html            single-page app: Google-style homepage + the five
+                      results sections, switched by js/app.js
+                        ?q=who+is+maddie                     About
+                        ?q=what+experiences+does+maddie+have Projects
+                        ?q=what+is+maddie+interested+in      Interests
+                        ?q=what+are+maddies+skills           Skills
+                        ?q=how+can+i+contact+maddie          Contact
 
 projects/             designed case study pages
   knosy.html          Knosy (Perplexity Agent Build Night winner)
@@ -37,15 +40,14 @@ skills/               skill deep-dives with proof-point chips
 
 | File | What it does |
 |---|---|
-| `css/style.css` | Chrome tab strip, Google home + results styling, knowledge panels, responsive rules |
+| `css/style.css` | Google home + results styling, knowledge panels, responsive rules |
 | `css/detail.css` | Detail pages only: case study layout (`.cs-*`), interest galleries (`.gallery`, `.ph` placeholders), skill rows (`.sk-*`) |
-| `js/chrome.js` | Renders the tab strip and toolbar everywhere. Tabs live in `CHROME_TABS`. Detail pages declare `data-root="../"`, `data-parent` (makes the toolbar back arrow work), and `data-path` (shown in the omnibox) |
-| `js/search.js` | Homepage suggestions and keyword routing (results pages only) |
+| `js/app.js` | The single-page router (sections and their questions live in `SECTIONS`), homepage suggestion dropdown, keyword routing for free-typed queries, wordmark colouring |
 | `site_assets/` | Headshot, resume PDF, project images, pitch video |
 
 ## Detail page anatomy
 
-Every detail page: Chrome tab strip (section tab stays active, clicking it returns to results), a toolbar back arrow that behaves like the real browser back button (falling back to the section results page on a direct landing), an accent color set inline via `--accent` on `<main>`, and a next-page footer link.
+Every detail page is a standalone document: an accent color set inline via `--accent` on `<main>` and a next-page footer link. The browser back button returns to the section results.
 
 ## Gallery photos (interests pages)
 

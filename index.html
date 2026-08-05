@@ -9,11 +9,15 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/style.css?v=6">
 </head>
-<body data-tab="home">
+<body>
 
-<div id="chrome-top"></div>
+<!-- ========================================================================
+     Homepage view (Google home screen). js/app.js swaps between this and
+     #view-results; the five section panels below hold the results content.
+     ======================================================================== -->
+<div id="view-home">
 
 <div class="home-topbar">
   <a href="site_assets/Madhurum_Bhuvan_Resume.pdf" target="_blank" rel="noopener">Resume</a>
@@ -39,31 +43,27 @@
       <span class="sb-icon" aria-hidden="true" title="Decorative">
         <svg viewBox="0 0 24 24" width="22" height="22"><circle cx="12" cy="12" r="3.4" fill="#4285F4"/><path fill="#EA4335" d="M4 8V6a2 2 0 0 1 2-2h2V2H6a4 4 0 0 0-4 4v2h2z"/><path fill="#FBBC05" d="M20 8V6a2 2 0 0 0-2-2h-2V2h2a4 4 0 0 1 4 4v2h-2z"/><path fill="#34A853" d="M4 16v2a2 2 0 0 0 2 2h2v2H6a4 4 0 0 1-4-4v-2h2z"/><circle cx="18.4" cy="18.4" r="2.6" fill="#EA4335"/></svg>
       </span>
-      <span class="ai-mode-pill" aria-hidden="true">
-        <svg viewBox="0 0 24 24" width="17" height="17"><defs><linearGradient id="sparkle-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4285F4"/><stop offset=".55" stop-color="#9b72cb"/><stop offset="1" stop-color="#d96570"/></linearGradient></defs><path fill="url(#sparkle-g)" d="M12 2c.6 4.9 2.6 7 7.5 7.5-4.9.6-7 2.6-7.5 7.5-.6-4.9-2.6-7-7.5-7.5C9.4 9 11.4 6.9 12 2z"/></svg>
-        <span>AI Mode</span>
-      </span>
     </div>
   </form>
 
   <nav class="shortcuts" aria-label="Sections">
-    <a class="shortcut" href="about.html">
+    <a class="shortcut" href="?q=who+is+maddie">
       <span class="disc"><svg viewBox="0 0 24 24" width="24" height="24" fill="#4285F4"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm0 2c-3.34 0-8 1.67-8 5v1h16v-1c0-3.33-4.66-5-8-5z"/></svg></span>
       <span>About Me</span>
     </a>
-    <a class="shortcut" href="projects.html">
+    <a class="shortcut" href="?q=what+experiences+does+maddie+have">
       <span class="disc"><svg viewBox="0 0 24 24" width="24" height="24" fill="#34A853"><path d="M10 4h4a2 2 0 0 1 2 2v1h4a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h4V6a2 2 0 0 1 2-2zm0 3h4V6h-4v1z"/></svg></span>
       <span>Projects</span>
     </a>
-    <a class="shortcut" href="interests.html">
+    <a class="shortcut" href="?q=what+is+maddie+interested+in">
       <span class="disc"><svg viewBox="0 0 24 24" width="24" height="24" fill="#EA4335"><path d="M12 21s-7.5-4.9-9.7-9A5.5 5.5 0 0 1 12 6.3 5.5 5.5 0 0 1 21.7 12c-2.2 4.1-9.7 9-9.7 9z"/></svg></span>
       <span>Interests</span>
     </a>
-    <a class="shortcut" href="skills.html">
+    <a class="shortcut" href="?q=what+are+maddies+skills">
       <span class="disc"><svg viewBox="0 0 24 24" width="24" height="24" fill="#FBBC05"><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.4 1 2.3h6c0-.9.4-1.8 1-2.3A7 7 0 0 0 12 2zm-3 17h6v1a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2v-1z"/></svg></span>
       <span>Skills</span>
     </a>
-    <a class="shortcut" href="contact.html">
+    <a class="shortcut" href="?q=how+can+i+contact+maddie">
       <span class="disc"><svg viewBox="0 0 24 24" width="24" height="24" fill="#4285F4"><path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zm8 7L4 6v2l8 5 8-5V6l-8 5z"/></svg></span>
       <span>Contact</span>
     </a>
@@ -72,7 +72,540 @@
 
 <footer class="g-footer home-footer">Designed and built by Maddie Bhuvan &middot; 2026</footer>
 
-<script src="js/chrome.js"></script>
-<script src="js/search.js"></script>
+</div>
+
+<!-- ========================================================================
+     Results view (Google search results look). One shared header and filter
+     row; js/app.js shows the panel matching the current ?q= and hides the
+     rest. Each panel keeps its own results count, AI Overview, results, and
+     knowledge panel.
+     ======================================================================== -->
+<div id="view-results" hidden>
+
+<header class="results-header">
+  <a class="mini-logo wordmark" data-text="Maddie" href="./">Maddie</a>
+  <form class="searchbox" data-search autocomplete="off">
+    <div class="searchbox-inner">
+      <span class="sb-fav" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="13" height="13" fill="#F4B400"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+      </span>
+      <input type="text" aria-label="Search my portfolio" />
+      <button class="sb-clear" type="button" aria-label="Clear search">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="#70757a"><path d="M19 6.4 17.6 5 12 10.6 6.4 5 5 6.4 10.6 12 5 17.6 6.4 19 12 13.4 17.6 19 19 17.6 13.4 12z"/></svg>
+      </button>
+      <span class="sb-sep" aria-hidden="true"></span>
+      <span class="sb-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="22" height="22"><path fill="#4285F4" d="M12 15c1.66 0 3-1.31 3-2.97V5.97C15 4.31 13.66 3 12 3S9 4.31 9 5.97v6.06C9 13.69 10.34 15 12 15z"/><path fill="#34A853" d="M11 18.08h2V22h-2z"/><path fill="#FBBC05" d="M7.05 16.87A6.98 6.98 0 0 1 5 12h2c0 1.45.56 2.42 1.47 3.38v.32l-1.42 1.17z"/><path fill="#EA4335" d="M12 16.93c-1.38 0-2.63-.6-3.54-1.55l-1.41 1.49A6.95 6.95 0 0 0 12 19c3.87 0 7-2.92 7-7h-2c0 2.92-2.24 4.93-5 4.93z"/></svg>
+      </span>
+      <span class="sb-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="22" height="22"><circle cx="12" cy="12" r="3.4" fill="#4285F4"/><path fill="#EA4335" d="M4 8V6a2 2 0 0 1 2-2h2V2H6a4 4 0 0 0-4 4v2h2z"/><path fill="#FBBC05" d="M20 8V6a2 2 0 0 0-2-2h-2V2h2a4 4 0 0 1 4 4v2h-2z"/><path fill="#34A853" d="M4 16v2a2 2 0 0 0 2 2h2v2H6a4 4 0 0 1-4-4v-2h2z"/><circle cx="18.4" cy="18.4" r="2.6" fill="#EA4335"/></svg>
+      </span>
+      <span class="sb-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="#4285F4"><path d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 1 0-.7.7l.27.28v.79l5 4.99L20.49 19zm-6 0A4.5 4.5 0 1 1 14 9.5 4.5 4.5 0 0 1 9.5 14z"/></svg>
+      </span>
+    </div>
+  </form>
+  <div class="header-icons">
+    <span class="apps-grid" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="#5f6368"><path d="M6 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm6 0a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm6 0a2 2 0 1 1 0-4 2 2 0 0 1 0 4zM6 14a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm6 0a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm6 0a2 2 0 1 1 0-4 2 2 0 0 1 0 4zM6 20a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm6 0a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm6 0a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/></svg>
+    </span>
+    <span class="home-avatar">M</span>
+  </div>
+</header>
+
+<nav class="results-nav" aria-label="Sections">
+  <a href="?q=who+is+maddie" data-section="about">About</a>
+  <a href="?q=what+experiences+does+maddie+have" data-section="projects">Projects</a>
+  <a href="?q=what+is+maddie+interested+in" data-section="interests">Interests</a>
+  <a href="?q=what+are+maddies+skills" data-section="skills">Skills</a>
+  <a href="?q=how+can+i+contact+maddie" data-section="contact">Contact</a>
+</nav>
+
+<!-- ============================== About ============================== -->
+<div class="section-panel" data-section="about" hidden>
+
+<div class="results-count">About 3 results (0.31 seconds)</div>
+
+<div class="results-layout">
+  <section class="ai-overview">
+    <div class="ai-ov-head">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="#4285F4" aria-hidden="true"><path d="M12 2c.6 4.9 2.6 7 7.5 7.5-4.9.6-7 2.6-7.5 7.5-.6-4.9-2.6-7-7.5-7.5C9.4 9 11.4 6.9 12 2z"/></svg>
+      <span>AI Overview</span>
+      <svg class="ai-ov-menu" viewBox="0 0 24 24" width="18" height="18" fill="#5f6368" aria-hidden="true"><path d="M12 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/></svg>
+    </div>
+    <div class="ai-ov-body">
+      <p>Madhurum (Maddie) Bhuvan is a UC Berkeley student. She was a <a href="projects/jpmc.html">Summer Analyst at JPMorgan Chase</a> in Summer 2026.<button class="cite-chip" type="button" data-cite hidden></button></p>
+      <h3 class="ai-ov-sub">Key Facts</h3>
+      <ul class="ai-ov-list">
+        <li><b>School:</b> UC Berkeley, class of 2028, studying business, cognitive science, and data science.</li>
+        <li><b>Roles:</b> JPMorgan Chase Summer Analyst (Summer 2026) and Internal Vice President of Net Impact Berkeley, where she secured $60K in project funding.</li>
+        <li><b>Also building:</b> DancerBase, an app for the dance community.</li>
+        <li><b>Looking for:</b> PM and AI PM internships.</li>
+      </ul>
+    </div>
+    <button class="ai-ov-more" type="button">Show more
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M7.4 8.6 12 13.2l4.6-4.6L18 10l-6 6-6-6z"/></svg>
+    </button>
+    <p class="ai-ov-disclaimer">AI responses may include mistakes</p>
+  </section>
+
+  <div class="results-main">
+
+    <article class="result" id="belief">
+      <div class="result-crumb">
+        <span class="fav-disc"><svg viewBox="0 0 24 24" width="13" height="13" fill="#F4B400"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></span>
+        <span class="crumb-text"><span class="site">Maddie Bhuvan</span><span class="url">mbhuvan-code.github.io &rsaquo; search &rsaquo; skills &rsaquo; how-i-work</span></span>
+        <svg class="r-menu" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/></svg>
+      </div>
+      <h3><a href="skills/how-i-work.html">Leading With Empathy</a></h3>
+      <p class="snippet"><b>Digital equity begins with accessible UX</b>: coming from a non-technical background, design became my translator for complex products.</p>
+    </article>
+
+    <article class="result" id="now-roles">
+      <div class="result-crumb">
+        <span class="fav-disc"><svg viewBox="0 0 24 24" width="13" height="13" fill="#F4B400"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></span>
+        <span class="crumb-text"><span class="site">Maddie Bhuvan</span><span class="url">mbhuvan-code.github.io &rsaquo; search &rsaquo; projects &rsaquo; jpmc</span></span>
+        <svg class="r-menu" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/></svg>
+      </div>
+      <h3><a href="projects/jpmc.html">Recent Roles</a></h3>
+      <p class="snippet"><b>JPMorgan Chase Summer Analyst, Summer 2026</b>, Internal Vice President of Net Impact Berkeley, where I secured <b>$60K in project funding</b>, and creator of DancerBase.</p>
+    </article>
+
+    <article class="result" id="status">
+      <div class="result-crumb">
+        <span class="fav-disc"><svg viewBox="0 0 24 24" width="13" height="13" fill="#F4B400"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></span>
+        <span class="crumb-text"><span class="site">Maddie Bhuvan</span><span class="url">mbhuvan-code.github.io &rsaquo; search &rsaquo; contact</span></span>
+        <svg class="r-menu" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/></svg>
+      </div>
+      <h3><a href="?q=how+can+i+contact+maddie">Open to Internships</a></h3>
+      <p class="snippet">Looking for a PM or AI PM intern who ships? The fastest way to reach me is email: <b>mbhuvan@berkeley.edu</b>.</p>
+    </article>
+
+  </div>
+
+  <aside class="kpanel">
+    <img class="kpanel-img" src="site_assets/headshot.jpg" alt="Maddie Bhuvan" />
+    <div class="kpanel-body">
+      <h2>Madhurum (Maddie) Bhuvan</h2>
+      <p class="sub">Aspiring AI Product Manager</p>
+      <hr />
+      <p><b>School:</b> UC Berkeley, class of 2028</p>
+      <p><b>Studies:</b> Business, Cognitive Science, Data Science</p>
+      <p><b>Summer 2026:</b> JPMorgan Chase Summer Analyst</p>
+      <p><b>Leadership:</b> Internal Vice President, Net Impact Berkeley, $60K in project funding</p>
+      <p><b>Status:</b> Open to PM and AI PM internships</p>
+      <div class="kpanel-actions">
+        <a href="mailto:mbhuvan@berkeley.edu">Email</a>
+        <a href="https://linkedin.com/in/madhurum-bhuvan" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="site_assets/Madhurum_Bhuvan_Resume.pdf" target="_blank" rel="noopener">Resume</a>
+      </div>
+    </div>
+  </aside>
+</div>
+
+</div>
+
+<!-- ============================= Projects ============================ -->
+<div class="section-panel" data-section="projects" hidden>
+
+<div class="results-count">About 7 results (0.28 seconds)</div>
+
+<div class="results-layout">
+  <section class="ai-overview">
+    <div class="ai-ov-head">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="#4285F4" aria-hidden="true"><path d="M12 2c.6 4.9 2.6 7 7.5 7.5-4.9.6-7 2.6-7.5 7.5-.6-4.9-2.6-7-7.5-7.5C9.4 9 11.4 6.9 12 2z"/></svg>
+      <span>AI Overview</span>
+      <svg class="ai-ov-menu" viewBox="0 0 24 24" width="18" height="18" fill="#5f6368" aria-hidden="true"><path d="M12 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/></svg>
+    </div>
+    <div class="ai-ov-body">
+      <p>Maddie Bhuvan's experience spans hackathon builds, end-to-end project management, healthcare research, and a <a href="projects/jpmc.html">Summer Analyst role at JPMorgan Chase</a>.<button class="cite-chip" type="button" data-cite hidden></button></p>
+      <h3 class="ai-ov-sub">Selected Experience</h3>
+      <ul class="ai-ov-list">
+        <li><b><a href="projects/knosy.html">Knosy</a>:</b> An AI meeting companion built in 3 hours; won Best Computer-Powered Product at the Perplexity Agent Build Night.</li>
+        <li><b><a href="projects/hackbubu.html">Hackbubu</a>:</b> A live needs-map for surplus donations, pitched at the SF Tech Week Hackathon.</li>
+        <li><b><a href="projects/goodwill.html">Evergreen Goodwill</a>:</b> An AI vendor scoring framework across 30-plus vendors that led to a leadership-backed recommendation.</li>
+        <li><b><a href="projects/blueshield.html">Blue Shield of California</a>:</b> 1,200-plus data points turned into recommendations clinicians could use.</li>
+        <li><b><a href="projects/jpmc.html">JPMorgan Chase</a>:</b> An SOP-writing AI tool adopted by 100-plus users and a 3rd-place finish out of ~600 employees in the Global Hackathon, Summer 2026.</li>
+        <li><b><a href="projects/dance-app.html">DancerBase</a>:</b> A class discovery app for dancers, launched supply-side first with 10 Bay Area studios.</li>
+        <li><b><a href="projects/project-unloaded.html">Project Unloaded</a>:</b> The Safer Not Using Guns campaign, scaled to 6 million-plus teens with a documented 25% attitude shift.</li>
+      </ul>
+    </div>
+    <button class="ai-ov-more" type="button">Show more
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M7.4 8.6 12 13.2l4.6-4.6L18 10l-6 6-6-6z"/></svg>
+    </button>
+    <p class="ai-ov-disclaimer">AI responses may include mistakes</p>
+  </section>
+
+  <div class="results-main">
+
+    <article class="result">
+      <div class="result-crumb">
+        <span class="fav-disc"><svg viewBox="0 0 24 24" width="13" height="13" fill="#F4B400"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></span>
+        <span class="crumb-text"><span class="site">Maddie Bhuvan</span><span class="url">mbhuvan-code.github.io &rsaquo; search &rsaquo; projects &rsaquo; knosy</span></span>
+        <svg class="r-menu" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/></svg>
+      </div>
+      <h3><a href="projects/knosy.html">Knosy</a></h3>
+      <p class="snippet">An AI meeting companion that keeps working after the meeting ends. I won <b>Best Computer-Powered Product</b> at the Perplexity Agent Build Night with a 3-hour build.</p>
+    </article>
+
+    <article class="result">
+      <div class="result-crumb">
+        <span class="fav-disc"><svg viewBox="0 0 24 24" width="13" height="13" fill="#F4B400"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></span>
+        <span class="crumb-text"><span class="site">Maddie Bhuvan</span><span class="url">mbhuvan-code.github.io &rsaquo; search &rsaquo; projects &rsaquo; hackbubu</span></span>
+        <svg class="r-menu" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/></svg>
+      </div>
+      <h3><a href="projects/hackbubu.html">Hackbubu</a></h3>
+      <p class="snippet">A live needs-map matching surplus resources to local organizations. I built it solo and pitched it live at the <b>SF Tech Week Hackathon</b>.</p>
+    </article>
+
+    <article class="result">
+      <div class="result-crumb">
+        <span class="fav-disc"><svg viewBox="0 0 24 24" width="13" height="13" fill="#F4B400"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></span>
+        <span class="crumb-text"><span class="site">Maddie Bhuvan</span><span class="url">mbhuvan-code.github.io &rsaquo; search &rsaquo; projects &rsaquo; goodwill</span></span>
+        <svg class="r-menu" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/></svg>
+      </div>
+      <h3><a href="projects/goodwill.html">Evergreen Goodwill</a></h3>
+      <p class="snippet">My end-to-end PM role: an AI vendor scoring framework across 30-plus vendors, <b>40% faster evaluation, $42K annual benefit</b>, presented to leadership.</p>
+    </article>
+
+    <article class="result">
+      <div class="result-crumb">
+        <span class="fav-disc"><svg viewBox="0 0 24 24" width="13" height="13" fill="#F4B400"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></span>
+        <span class="crumb-text"><span class="site">Maddie Bhuvan</span><span class="url">mbhuvan-code.github.io &rsaquo; search &rsaquo; projects &rsaquo; blueshield</span></span>
+        <svg class="r-menu" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/></svg>
+      </div>
+      <h3><a href="projects/blueshield.html">Blue Shield of California</a></h3>
+      <p class="snippet">I turned <b>1,200-plus data points</b> into five structural recommendations and a provider one-pager clinicians could use.</p>
+    </article>
+
+    <article class="result">
+      <div class="result-crumb">
+        <span class="fav-disc"><svg viewBox="0 0 24 24" width="13" height="13" fill="#F4B400"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></span>
+        <span class="crumb-text"><span class="site">Maddie Bhuvan</span><span class="url">mbhuvan-code.github.io &rsaquo; search &rsaquo; projects &rsaquo; jpmc</span></span>
+        <svg class="r-menu" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/></svg>
+      </div>
+      <h3><a href="projects/jpmc.html">Inside JPMorgan Chase</a></h3>
+      <p class="snippet">Summer 2026 as a Summer Analyst: an <b>SOP-writing AI tool adopted by 100-plus users</b>, a <b>3rd-place finish out of ~600 employees</b> in the Global Hackathon, and Python for policy-to-control mapping in Fusion.</p>
+      <div class="chips">
+        <a class="chip" href="projects/jpmc.html">An SOP-Writing AI Tool...</a>
+        <a class="chip" href="projects/jpmc.html">The Firmwide Hackathon...</a>
+      </div>
+    </article>
+
+    <article class="result">
+      <div class="result-crumb">
+        <span class="fav-disc"><svg viewBox="0 0 24 24" width="13" height="13" fill="#F4B400"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></span>
+        <span class="crumb-text"><span class="site">Maddie Bhuvan</span><span class="url">mbhuvan-code.github.io &rsaquo; search &rsaquo; projects &rsaquo; dance-app</span></span>
+        <svg class="r-menu" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/></svg>
+      </div>
+      <h3><a href="projects/dance-app.html">DancerBase</a></h3>
+      <p class="snippet">A class discovery app that lets dancers pick classes by who they trust. I launched supply-side first, recruiting <b>10 Bay Area studios</b> to beat the cold-start problem, and A/B tested the UI in Figma.</p>
+    </article>
+
+    <article class="result">
+      <div class="result-crumb">
+        <span class="fav-disc"><svg viewBox="0 0 24 24" width="13" height="13" fill="#F4B400"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></span>
+        <span class="crumb-text"><span class="site">Maddie Bhuvan</span><span class="url">mbhuvan-code.github.io &rsaquo; search &rsaquo; projects &rsaquo; project-unloaded</span></span>
+        <svg class="r-menu" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/></svg>
+      </div>
+      <h3><a href="projects/project-unloaded.html">Project Unloaded</a></h3>
+      <p class="snippet">As Creator Corps Lead I scaled the <b>Safer Not Using Guns campaign to 6 million-plus teens</b>, driving a <b>documented 25% attitude shift</b> from 350-plus hours of media analysis.</p>
+    </article>
+
+  </div>
+
+  <aside class="kpanel">
+    <div class="kpanel-body">
+      <h2>Experience timeline</h2>
+      <p class="sub">Recent and ongoing</p>
+      <hr />
+      <ul class="kpanel-list">
+        <li><b>Since Jun 2023</b> &middot; Project Unloaded, Creator Corps Lead</li>
+        <li><b>Jan to May 2025</b> &middot; Blue Shield of California, Contract Research Analyst</li>
+        <li><b>Mar to Dec 2025</b> &middot; Evergreen Goodwill, Project Manager</li>
+        <li><b>Nov 2025</b> &middot; Hackbubu, SF Tech Week Hackathon</li>
+        <li><b>Apr 2026</b> &middot; Knosy, Perplexity Agent Build Night winner</li>
+        <li><b>Summer 2026</b> &middot; JPMorgan Chase, Summer Analyst</li>
+        <li><b>Since Jun 2026</b> &middot; DancerBase, Creator and Product Owner</li>
+      </ul>
+      <div class="kpanel-actions">
+        <a href="site_assets/Madhurum_Bhuvan_Resume.pdf" target="_blank" rel="noopener">Resume</a>
+        <a href="?q=what+are+maddies+skills">Skills</a>
+        <a href="?q=how+can+i+contact+maddie">Contact</a>
+      </div>
+    </div>
+  </aside>
+</div>
+
+</div>
+
+<!-- ============================ Interests ============================ -->
+<div class="section-panel" data-section="interests" hidden>
+
+<div class="results-count">About 3 results (0.19 seconds)</div>
+
+<div class="results-layout">
+  <section class="ai-overview">
+    <div class="ai-ov-head">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="#4285F4" aria-hidden="true"><path d="M12 2c.6 4.9 2.6 7 7.5 7.5-4.9.6-7 2.6-7.5 7.5-.6-4.9-2.6-7-7.5-7.5C9.4 9 11.4 6.9 12 2z"/></svg>
+      <span>AI Overview</span>
+      <svg class="ai-ov-menu" viewBox="0 0 24 24" width="18" height="18" fill="#5f6368" aria-hidden="true"><path d="M12 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/></svg>
+    </div>
+    <div class="ai-ov-body">
+      <p>Outside of product work, Maddie Bhuvan's main interests are <a href="interests/dance.html">dance</a>, <a href="interests/music.html">music</a>, and <a href="interests/travel.html">travel</a>.<button class="cite-chip" type="button" data-cite hidden></button></p>
+      <h3 class="ai-ov-sub">Main Interests</h3>
+      <ul class="ai-ov-list">
+        <li><b>Dance:</b> Competing and choreographing in hip-hop and Bollywood circuits since age 5, including a 5th-place national finish at World of Dance.</li>
+        <li><b>Music and DJing:</b> Indian classical vocals from age 5, 8 years of drums, and currently learning to DJ.</li>
+        <li><b>Travel and photography:</b> 15 trips last year, camera in hand.</li>
+      </ul>
+    </div>
+    <button class="ai-ov-more" type="button">Show more
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M7.4 8.6 12 13.2l4.6-4.6L18 10l-6 6-6-6z"/></svg>
+    </button>
+    <p class="ai-ov-disclaimer">AI responses may include mistakes</p>
+  </section>
+
+  <div class="results-main">
+
+    <article class="result">
+      <div class="result-crumb">
+        <span class="fav-disc"><svg viewBox="0 0 24 24" width="13" height="13" fill="#F4B400"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></span>
+        <span class="crumb-text"><span class="site">Maddie Bhuvan</span><span class="url">mbhuvan-code.github.io &rsaquo; search &rsaquo; interests &rsaquo; dance</span></span>
+        <svg class="r-menu" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/></svg>
+      </div>
+      <h3><a href="interests/dance.html">Dance</a></h3>
+      <p class="snippet">Dancing since age 5, I compete and choreograph in <b>hip-hop and Bollywood circuits</b>, placing 5th nationally at World of Dance and background-dancing for Diljit Dosanjh at Oakland Arena.</p>
+      <div class="chips">
+        <a class="chip" href="interests/dance.html">5th Nationally at World of D...</a>
+        <a class="chip" href="interests/dance.html">Dancing for Diljit Dosanjh...</a>
+      </div>
+    </article>
+
+    <article class="result">
+      <div class="result-crumb">
+        <span class="fav-disc"><svg viewBox="0 0 24 24" width="13" height="13" fill="#F4B400"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></span>
+        <span class="crumb-text"><span class="site">Maddie Bhuvan</span><span class="url">mbhuvan-code.github.io &rsaquo; search &rsaquo; interests &rsaquo; music</span></span>
+        <svg class="r-menu" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/></svg>
+      </div>
+      <h3><a href="interests/music.html">Music and DJing</a></h3>
+      <p class="snippet"><b>Indian classical vocals from age 5, drums for 8 years</b>, currently teaching myself to DJ, and double-digit concerts a year.</p>
+    </article>
+
+    <article class="result">
+      <div class="result-crumb">
+        <span class="fav-disc"><svg viewBox="0 0 24 24" width="13" height="13" fill="#F4B400"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></span>
+        <span class="crumb-text"><span class="site">Maddie Bhuvan</span><span class="url">mbhuvan-code.github.io &rsaquo; search &rsaquo; interests &rsaquo; travel</span></span>
+        <svg class="r-menu" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/></svg>
+      </div>
+      <h3><a href="interests/travel.html">Travel and Photography</a></h3>
+      <p class="snippet"><b>15 trips last year</b>, camera always in hand. I am happiest finding the side quest and taking the long way there.</p>
+    </article>
+
+  </div>
+
+  <aside class="kpanel">
+    <div class="kpanel-body">
+      <h2>Quick facts</h2>
+      <p class="sub">Life outside the roadmap</p>
+      <hr />
+      <ul class="kpanel-list">
+        <li><b>Dancing since:</b> age 5, ballet to Bollywood fusion</li>
+        <li><b>Best placement:</b> 5th nationally, World of Dance</li>
+        <li><b>Stage moment:</b> background dancer for Diljit Dosanjh, Oakland Arena</li>
+        <li><b>Instruments:</b> Indian classical vocals, 8 years of drums</li>
+        <li><b>Learning now:</b> DJing</li>
+        <li><b>Trips last year:</b> 15, camera in hand</li>
+      </ul>
+    </div>
+  </aside>
+</div>
+
+</div>
+
+<!-- ============================== Skills ============================= -->
+<div class="section-panel" data-section="skills" hidden>
+
+<div class="results-count">About 4 results (0.24 seconds)</div>
+
+<div class="results-layout">
+  <section class="ai-overview">
+    <div class="ai-ov-head">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="#4285F4" aria-hidden="true"><path d="M12 2c.6 4.9 2.6 7 7.5 7.5-4.9.6-7 2.6-7.5 7.5-.6-4.9-2.6-7-7.5-7.5C9.4 9 11.4 6.9 12 2z"/></svg>
+      <span>AI Overview</span>
+      <svg class="ai-ov-menu" viewBox="0 0 24 24" width="18" height="18" fill="#5f6368" aria-hidden="true"><path d="M12 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/></svg>
+    </div>
+    <div class="ai-ov-body">
+      <p>Maddie Bhuvan's skills span <a href="skills/product.html">product</a>, <a href="skills/technical.html">technical</a>, and <a href="skills/how-i-work.html">working-style</a> areas.<button class="cite-chip" type="button" data-cite hidden></button></p>
+      <h3 class="ai-ov-sub">Skill Areas</h3>
+      <ul class="ai-ov-list">
+        <li><b>Product:</b> Discovery, user research, roadmapping, and KPI definition.</li>
+        <li><b>Technical:</b> Python and SQL, AI tooling and prompt design, and rapid prototyping in Figma.</li>
+        <li><b>How she works:</b> Breaking down ambiguity, translating research to product, and leading with user empathy.</li>
+        <li><b>Credentials:</b> Two LinkedIn Learning credentials completed in 2026, including <a href="skills/product.html#credentials">Generative AI for Product Managers</a>.</li>
+      </ul>
+    </div>
+    <button class="ai-ov-more" type="button">Show more
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M7.4 8.6 12 13.2l4.6-4.6L18 10l-6 6-6-6z"/></svg>
+    </button>
+    <p class="ai-ov-disclaimer">AI responses may include mistakes</p>
+  </section>
+
+  <div class="results-main">
+
+    <article class="result">
+      <div class="result-crumb">
+        <span class="fav-disc"><svg viewBox="0 0 24 24" width="13" height="13" fill="#F4B400"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></span>
+        <span class="crumb-text"><span class="site">Maddie Bhuvan</span><span class="url">mbhuvan-code.github.io &rsaquo; search &rsaquo; skills &rsaquo; product</span></span>
+        <svg class="r-menu" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/></svg>
+      </div>
+      <h3><a href="skills/product.html">Product</a></h3>
+      <p class="snippet">The core PM toolkit, from <b>user research to prioritization</b>, each skill tied to the project where I used it.</p>
+      <div class="chips">
+        <a class="chip" href="skills/product.html#credentials">The LinkedIn Learning Creden...</a>
+        <a class="chip" href="skills/product.html">User Research to Prioritiza...</a>
+      </div>
+    </article>
+
+    <article class="result">
+      <div class="result-crumb">
+        <span class="fav-disc"><svg viewBox="0 0 24 24" width="13" height="13" fill="#F4B400"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></span>
+        <span class="crumb-text"><span class="site">Maddie Bhuvan</span><span class="url">mbhuvan-code.github.io &rsaquo; search &rsaquo; skills &rsaquo; technical</span></span>
+        <svg class="r-menu" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/></svg>
+      </div>
+      <h3><a href="skills/technical.html">Technical</a></h3>
+      <p class="snippet">Enough hands-on capability to <b>build the thing, not just spec it</b>: Python, prompt design, Figma, and Excel modeling.</p>
+    </article>
+
+    <article class="result">
+      <div class="result-crumb">
+        <span class="fav-disc"><svg viewBox="0 0 24 24" width="13" height="13" fill="#F4B400"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></span>
+        <span class="crumb-text"><span class="site">Maddie Bhuvan</span><span class="url">mbhuvan-code.github.io &rsaquo; search &rsaquo; skills &rsaquo; how-i-work</span></span>
+        <svg class="r-menu" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/></svg>
+      </div>
+      <h3><a href="skills/how-i-work.html">How I Work</a></h3>
+      <p class="snippet">Product as translation work: <b>breaking down ambiguity</b> and leading with empathy for the user.</p>
+    </article>
+
+    <article class="result">
+      <div class="result-crumb">
+        <span class="fav-disc"><svg viewBox="0 0 24 24" width="13" height="13" fill="#F4B400"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></span>
+        <span class="crumb-text"><span class="site">Maddie Bhuvan</span><span class="url">mbhuvan-code.github.io &rsaquo; search &rsaquo; skills &rsaquo; credentials</span></span>
+        <svg class="r-menu" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/></svg>
+      </div>
+      <h3><a href="skills/product.html#credentials">Credentials</a></h3>
+      <p class="snippet">Two LinkedIn Learning credentials completed in 2026, including <b>Generative AI for Product Managers</b>.</p>
+    </article>
+
+  </div>
+
+  <aside class="kpanel">
+    <div class="kpanel-body">
+      <h2>Skills at a glance</h2>
+      <p class="sub">Where they came from</p>
+      <hr />
+      <ul class="kpanel-list">
+        <li><b>AI tooling and prototyping</b> &middot; Knosy, Hackbubu, JPMC SOP tool</li>
+        <li><b>Python builds</b> &middot; JPMC policy mapping in Fusion, Predictive Data Analyzer, OOP Simulation</li>
+        <li><b>Discovery and research</b> &middot; 20-plus leader interviews at Goodwill, 30-plus provider interviews at Blue Shield</li>
+        <li><b>KPI dashboards</b> &middot; Evergreen Goodwill aftermarket transparency</li>
+        <li><b>Executive storytelling</b> &middot; leadership presentations at Goodwill and Blue Shield</li>
+      </ul>
+      <div class="kpanel-actions">
+        <a href="?q=what+experiences+does+maddie+have">See the projects</a>
+        <a href="site_assets/Madhurum_Bhuvan_Resume.pdf" target="_blank" rel="noopener">Resume</a>
+      </div>
+    </div>
+  </aside>
+</div>
+
+</div>
+
+<!-- ============================= Contact ============================= -->
+<div class="section-panel" data-section="contact" hidden>
+
+<div class="results-count">About 3 results (0.12 seconds)</div>
+
+<div class="results-layout">
+  <section class="ai-overview">
+    <div class="ai-ov-head">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="#4285F4" aria-hidden="true"><path d="M12 2c.6 4.9 2.6 7 7.5 7.5-4.9.6-7 2.6-7.5 7.5-.6-4.9-2.6-7-7.5-7.5C9.4 9 11.4 6.9 12 2z"/></svg>
+      <span>AI Overview</span>
+      <svg class="ai-ov-menu" viewBox="0 0 24 24" width="18" height="18" fill="#5f6368" aria-hidden="true"><path d="M12 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/></svg>
+    </div>
+    <div class="ai-ov-body">
+      <p>Maddie Bhuvan can be reached by <a href="#email">email</a>, on <a href="#linkedin">LinkedIn</a>, or through her <a href="#resume">resume</a>.<button class="cite-chip" type="button" data-cite hidden></button></p>
+      <h3 class="ai-ov-sub">Contact Options</h3>
+      <ul class="ai-ov-list">
+        <li><b>Email:</b> mbhuvan@berkeley.edu, the fastest way to reach her.</li>
+        <li><b>LinkedIn:</b> linkedin.com/in/madhurum-bhuvan.</li>
+        <li><b>Resume:</b> Available as a one-page PDF.</li>
+        <li><b>Status:</b> Open to PM and AI PM internships.</li>
+      </ul>
+    </div>
+    <button class="ai-ov-more" type="button">Show more
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M7.4 8.6 12 13.2l4.6-4.6L18 10l-6 6-6-6z"/></svg>
+    </button>
+    <p class="ai-ov-disclaimer">AI responses may include mistakes</p>
+  </section>
+
+  <div class="results-main">
+
+    <article class="result" id="email">
+      <div class="result-crumb">
+        <span class="fav-disc"><svg viewBox="0 0 24 24" width="13" height="13" fill="#F4B400"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></span>
+        <span class="crumb-text"><span class="site">Maddie Bhuvan</span><span class="url">mailto &rsaquo; mbhuvan@berkeley.edu</span></span>
+        <svg class="r-menu" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/></svg>
+      </div>
+      <h3><a href="mailto:mbhuvan@berkeley.edu">Email Me</a></h3>
+      <p class="snippet">The fastest way to reach me: a click opens a draft addressed to <b>mbhuvan@berkeley.edu</b>.</p>
+    </article>
+
+    <article class="result" id="linkedin">
+      <div class="result-crumb">
+        <span class="fav-disc"><svg viewBox="0 0 24 24" width="13" height="13" fill="#F4B400"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></span>
+        <span class="crumb-text"><span class="site">LinkedIn</span><span class="url">linkedin.com &rsaquo; in &rsaquo; madhurum-bhuvan</span></span>
+        <svg class="r-menu" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/></svg>
+      </div>
+      <h3><a href="https://linkedin.com/in/madhurum-bhuvan" target="_blank" rel="noopener">LinkedIn</a></h3>
+      <p class="snippet">Connect or send me a message on <b>LinkedIn</b>.</p>
+    </article>
+
+    <article class="result" id="resume">
+      <div class="result-crumb">
+        <span class="fav-disc"><svg viewBox="0 0 24 24" width="13" height="13" fill="#F4B400"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></span>
+        <span class="crumb-text"><span class="site">Maddie Bhuvan</span><span class="url">mbhuvan-code.github.io &rsaquo; search &rsaquo; resume.pdf</span></span>
+        <svg class="r-menu" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/></svg>
+      </div>
+      <h3><a href="site_assets/Madhurum_Bhuvan_Resume.pdf" target="_blank" rel="noopener">Resume</a></h3>
+      <p class="snippet">The full picture in one page: <b>Madhurum_Bhuvan_Resume.pdf</b>, opens in a new tab.</p>
+    </article>
+
+  </div>
+
+  <aside class="kpanel">
+    <div class="kpanel-body">
+      <h2>Get in touch</h2>
+      <p class="sub">Open to PM and AI PM internships</p>
+      <hr />
+      <p><b>Email:</b> mbhuvan@berkeley.edu</p>
+      <p><b>LinkedIn:</b> linkedin.com/in/madhurum-bhuvan</p>
+      <div class="kpanel-actions">
+        <a href="mailto:mbhuvan@berkeley.edu">Email Me</a>
+        <a href="https://linkedin.com/in/madhurum-bhuvan" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="site_assets/Madhurum_Bhuvan_Resume.pdf" target="_blank" rel="noopener">Resume</a>
+      </div>
+    </div>
+  </aside>
+</div>
+
+</div>
+
+<footer class="g-footer">Designed and built by Maddie Bhuvan &middot; 2026</footer>
+
+</div>
+
+<!-- bump ?v= when redeploying so browsers pick up the new CSS/JS -->
+<script src="js/app.js?v=6"></script>
 </body>
 </html>
