@@ -30,10 +30,13 @@ const SEARCH_SUGGESTIONS = [
   { text: "How can I contact Maddie?",          section: "contact" }
 ];
 
-/* Free-typed queries are matched against keyword lists (first match wins).
-   Unmatched queries go to About. */
+/* Free-typed queries are scored against these keyword lists: the section
+   hitting the most keywords wins, ties keep the order below, and a query
+   that hits nothing falls back to About. Keywords are matched as
+   prefixes at word starts, so stems ("hobb", "certificat") are deliberate
+   and catch their whole family. */
 const KEYWORD_ROUTES = [
-  { section: "interests", words: ["interest", "hobby", "dance", "music", "dj", "travel", "photo", "concert", "fun"] },
+  { section: "interests", words: ["interest", "hobb", "dance", "music", "dj", "travel", "photo", "concert", "fun", "outside", "free time", "spare time", "passion", "personal life", "like to do"] },
   { section: "projects",  words: ["project", "experience", "work", "intern", "built", "build", "ship", "knosy", "hackbubu", "goodwill", "blue shield", "jpmorgan", "jpmc", "startup", "case", "hackathon"] },
   { section: "skills",    words: ["skill", "credential", "certificat", "tool", "sql", "python", "figma", "roadmap", "agile", "excel", "research"] },
   { section: "contact",   words: ["contact", "email", "reach", "linkedin", "resume", "hire", "touch"] },
@@ -205,14 +208,65 @@ document.querySelectorAll(".section-panel").forEach(panel => {
 const viewHome = document.getElementById("view-home");
 const viewResults = document.getElementById("view-results");
 
-/* ?q=who+is+maddie -> "about"; anything unrecognized -> null (homepage) */
-function sectionFromSearch(search) {
+/* Where a query lands when it scores against nothing: About, rather than a
+   dead end. */
+const FALLBACK_SECTION = "about";
+
+/* A ?q= value resolves to one of three views, all of them shareable:
+     no q                      -> homepage
+     a section's own question  -> that section
+     free text                 -> the section it scores against, or About
+                                  when it scores against nothing, either way
+                                  headed by the correction notice */
+function stateFromSearch(search) {
   const q = new URLSearchParams(search).get("q");
-  if (!q) return null;
+  if (!q) return { section: null, query: null };
   for (const [id, s] of Object.entries(SECTIONS)) {
-    if (s.slug.replace(/\+/g, " ") === q) return id;
+    if (s.slug.replace(/\+/g, " ") === q) return { section: id, query: null };
   }
-  return null;
+  return { section: scoreQuery(q) || FALLBACK_SECTION, query: q };
+}
+
+/* Does `word` start a word in `q`? Anchored to a word start rather than a
+   bare substring, so "dj" cannot fire inside a keysmash and "case" cannot
+   fire inside "showcase". Still a prefix match past that point, because
+   several keywords are deliberately stems ("certificat", "photo"). */
+function startsWord(q, word) {
+  const escaped = word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return new RegExp("(^|[^a-z0-9])" + escaped).test(q);
+}
+
+/* "outside of work", "besides work" and friends all ask about Interests,
+   not Projects. Normalise the whole phrase to the one Interests keyword it
+   means, which both removes the "work" that would have scored for Projects
+   and lets every synonym score for Interests. */
+const WORK_NEGATIONS = /\b(?:outside|besides|beyond|apart from|other than|away from)(?:\s+of)?\s+work\w*/g;
+
+/* Best-scoring section for free text, or null when nothing matches.
+   Score is how many of a section's keywords the query hits; ties keep
+   KEYWORD_ROUTES order, so the old first-match precedence still holds. */
+function scoreQuery(raw) {
+  const q = (raw || "").toLowerCase().replace(WORK_NEGATIONS, "outside");
+  let best = null;
+  let bestScore = 0;
+  for (const route of KEYWORD_ROUTES) {
+    const score = route.words.filter(w => startsWord(q, w)).length;
+    if (score > bestScore) {
+      best = route.section;
+      bestScore = score;
+    }
+  }
+  return best;
+}
+
+function escapeHTML(str) {
+  return String(str).replace(/[&<>"']/g, c =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+
+/* Spaces as "+", the way the canonical slugs are written */
+function encodeQ(query) {
+  return encodeURIComponent(query).replace(/%20/g, "+");
 }
 
 /* Compact mode (below 1000px): the source panel folds into the AI Overview
@@ -249,16 +303,19 @@ function updateOverviewState(panel) {
   ov.querySelector(".ai-ov-more").hidden = open || !(bodyOverflow || foldedSources);
 }
 
-/* Render a state: null = homepage, otherwise a section id */
-function show(section) {
+/* Render a state:
+     (null, null)      homepage
+     (section, null)   that section
+     (section, query)  that section, headed by the correction notice */
+function show(section, query) {
   document.querySelectorAll(".searchbox.open").forEach(b => b.classList.remove("open"));
   if (!section) {
     viewHome.hidden = false;
     viewResults.hidden = true;
     viewHome.querySelector(".searchbox input").value = "";
     document.title = HOME_TITLE;
+    showCorrection(null);
   } else {
-    const s = SECTIONS[section];
     viewHome.hidden = true;
     viewResults.hidden = false;
     document.querySelectorAll(".section-panel").forEach(p => {
@@ -267,11 +324,40 @@ function show(section) {
     document.querySelectorAll(".results-nav a").forEach(a => {
       a.classList.toggle("on", a.dataset.section === section);
     });
-    viewResults.querySelector(".results-header .searchbox input").value = s.q;
-    document.title = s.q + " - Google Search";
+    // the search box always shows what was actually searched for
+    const typed = query || SECTIONS[section].q;
+    viewResults.querySelector(".results-header .searchbox input").value = typed;
+    document.title = typed + " - Google Search";
+    showCorrection(query ? { section, query } : null);
     layoutPanel(document.querySelector(`.section-panel[data-section="${section}"]`));
   }
   window.scrollTo(0, 0);
+}
+
+/* "These are results for ..." above the results of a free-typed query. The
+   line under it depends on why we are here: a query that scored says which
+   search these results answer, while one that scored nothing says so
+   plainly, having fallen back to About. */
+function showCorrection(info) {
+  document.querySelectorAll(".did-you-mean").forEach(el => el.remove());
+  document.querySelectorAll(".results-count").forEach(c => { c.hidden = false; });
+  if (!info) return;
+  const s = SECTIONS[info.section];
+  const matched = !!scoreQuery(info.query);
+  const el = document.createElement("div");
+  el.className = "did-you-mean";
+  el.innerHTML =
+    `<p>These are results for <a class="dym-fix" href="?q=${s.slug}">${escapeHTML(s.q)}</a></p>` +
+    (matched
+      ? `<p class="dym-instead">This is the most relevant when searching for ` +
+        `<b><i>${escapeHTML(info.query)}</i></b></p>`
+      : `<p class="dym-instead">Your search - <b>${escapeHTML(info.query)}</b> ` +
+        `- did not match any documents.</p>`);
+  const panel = document.querySelector(`.section-panel[data-section="${info.section}"]`);
+  const count = panel.querySelector(".results-count");
+  // "About N results" would contradict "did not match any documents"
+  if (!matched) count.hidden = true;
+  count.insertAdjacentElement("afterend", el);
 }
 
 /* Re-apply everything layout-dependent for the visible section. Hooked to
@@ -345,20 +431,23 @@ function layoutPanel(panel) {
 }
 
 /* Navigate to a state and record it in real browser history */
-function navigate(section) {
-  const url = section ? "?q=" + SECTIONS[section].slug : location.pathname;
-  history.pushState({ section }, "", url);
-  show(section);
+function navigate(section, query) {
+  const url = query
+    ? "?q=" + encodeQ(query)
+    : (section ? "?q=" + SECTIONS[section].slug : location.pathname);
+  history.pushState({ section, query: query || null }, "", url);
+  show(section, query);
 }
 
 window.addEventListener("popstate", e => {
-  show(e.state ? e.state.section : sectionFromSearch(location.search));
+  const st = e.state && "query" in e.state ? e.state : stateFromSearch(location.search);
+  show(st.section, st.query);
 });
 
-/* Direct landings on a shared ?q= URL start on that section */
-const initial = sectionFromSearch(location.search);
-history.replaceState({ section: initial }, "");
-show(initial);
+/* Direct landings on a shared ?q= URL start on that view */
+const initial = stateFromSearch(location.search);
+history.replaceState(initial, "");
+show(initial.section, initial.query);
 
 /* Links whose href is "?q=..." (tiles, filter row, cross-section links) and
    the mini wordmark ("./") are in-page navigations, not full page loads. */
@@ -371,21 +460,27 @@ document.addEventListener("click", e => {
     navigate(null);
   } else if (href.startsWith("?q=")) {
     e.preventDefault();
-    navigate(sectionFromSearch(href));
+    const st = stateFromSearch(href);
+    navigate(st.section, st.query);
   }
 });
 
 /* ------------------------------------------------------------------ search */
 
+/* A typed query keeps its own text in the URL and the search box. It lands
+   on the section it scores against, or on About when it scores against
+   nothing; either way the correction notice explains which it is. */
 function routeQuery(raw) {
-  const q = (raw || "").toLowerCase();
-  for (const route of KEYWORD_ROUTES) {
-    if (route.words.some(w => q.includes(w))) {
-      navigate(route.section);
+  const query = (raw || "").trim();
+  if (!query) return;
+  // typing a section's own question is that search, not a correction of it
+  for (const [id, s] of Object.entries(SECTIONS)) {
+    if (s.q === query.toLowerCase()) {
+      navigate(id);
       return;
     }
   }
-  navigate("about"); // default when nothing matches
+  navigate(scoreQuery(query) || FALLBACK_SECTION, query);
 }
 
 document.querySelectorAll("form[data-search]").forEach(form => {
@@ -412,27 +507,57 @@ document.querySelectorAll(".sb-clear").forEach(btn => {
 
   const list = document.createElement("div");
   list.className = "suggestions";
-  const searchIcon = '<span class="sb-icon"><svg viewBox="0 0 24 24" width="17" height="17" fill="#9aa0a6"><path d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 1 0-.7.7l.27.28v.79l5 4.99L20.49 19zm-6 0A4.5 4.5 0 1 1 14 9.5 4.5 4.5 0 0 1 9.5 14z"/></svg></span>';
-  list.innerHTML = SEARCH_SUGGESTIONS.map(s =>
-    `<div class="suggestion" data-section="${s.section}">${searchIcon}<span>${s.text}</span></div>`
-  ).join("");
   box.appendChild(list);
 
-  input.addEventListener("focus", () => box.classList.add("open"));
-  box.addEventListener("click", () => box.classList.add("open"));
+  const searchIcon = '<span class="sb-icon"><svg viewBox="0 0 24 24" width="17" height="17" fill="#9aa0a6"><path d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 1 0-.7.7l.27.28v.79l5 4.99L20.49 19zm-6 0A4.5 4.5 0 1 1 14 9.5 4.5 4.5 0 0 1 9.5 14z"/></svg></span>';
+
+  const bold = str => (str ? `<b>${escapeHTML(str)}</b>` : "");
+
+  /* Rows for what has been typed so far: the suggestions containing it,
+     with everything still to type in bold, the way Google does it. */
+  function rowsFor(typed) {
+    const needle = typed.trim().toLowerCase();
+    return SEARCH_SUGGESTIONS
+      .filter(s => s.text.toLowerCase().includes(needle))
+      .map(s => {
+        const at = needle ? s.text.toLowerCase().indexOf(needle) : -1;
+        const label = at < 0
+          ? escapeHTML(s.text)
+          : bold(s.text.slice(0, at)) +
+            escapeHTML(s.text.slice(at, at + needle.length)) +
+            bold(s.text.slice(at + needle.length));
+        return `<div class="suggestion" data-section="${s.section}">${searchIcon}<span>${label}</span></div>`;
+      });
+  }
+
+  /* Refill the dropdown. With nothing left to suggest there is nothing to
+     drop down, so it closes rather than opening an empty white box. */
+  function render(open) {
+    const rows = rowsFor(input.value);
+    list.innerHTML = rows.join("");
+    box.classList.toggle("open", !!open && rows.length > 0);
+  }
+
+  input.addEventListener("focus", () => render(true));
+  input.addEventListener("input", () => render(true));
+  box.addEventListener("click", e => {
+    if (!list.contains(e.target)) render(true);
+  });
   document.addEventListener("click", e => {
     if (!box.contains(e.target)) box.classList.remove("open");
   });
   input.addEventListener("keydown", e => {
     if (e.key === "Escape") box.classList.remove("open");
   });
-  // mousedown so the click wins over the input losing focus
-  list.querySelectorAll(".suggestion").forEach(row => {
-    row.addEventListener("mousedown", e => {
-      e.stopPropagation();
-      navigate(row.dataset.section);
-    });
+  // mousedown so the click wins over the input losing focus; delegated so it
+  // survives every rebuild of the rows
+  list.addEventListener("mousedown", e => {
+    const row = e.target.closest(".suggestion");
+    if (!row) return;
+    e.stopPropagation();
+    navigate(row.dataset.section);
   });
+  render(false);
 })();
 
 /* ---------------------------------------------------------- page behaviors */

@@ -70,7 +70,15 @@ h1,h2,h3,h4{margin:0;font-weight:400}
   display:flex;align-items:center;justify-content:center;font:500 16px var(--font-ui);
 }
 
-.home-center{max-width:720px;margin:0 auto;padding:9vh 20px 60px;text-align:center}
+/* The homepage fills the viewport and centres its content in whatever space
+   the top bar and footer leave over, so it sits true on any screen instead
+   of being pushed down by a fixed top padding. dvh keeps it honest on
+   mobile, where the browser chrome changes the usable height. */
+#view-home{display:flex;flex-direction:column;min-height:100vh;min-height:100dvh}
+.home-center{
+  flex:1;display:flex;flex-direction:column;justify-content:center;
+  width:100%;max-width:720px;margin:0 auto;padding:24px 20px;text-align:center;
+}
 .home-logo{font-size:clamp(32px,5vw,66px);line-height:1.1}
 .home-center .searchbox{width:min(584px,100%)}
 
@@ -165,6 +173,17 @@ h1,h2,h3,h4{margin:0;font-weight:400}
 .results-nav a:not(.on):hover{color:var(--text)}
 
 .results-count{margin:14px 28px 0 var(--results-left);font-size:13px;color:var(--text-faint)}
+
+/* Correction header: "These are results for <question>" above a free-typed
+   query's results, with what was actually typed on the line below. */
+.did-you-mean{margin:12px 28px 0 var(--results-left);max-width:652px}
+.did-you-mean p{margin:0}
+.did-you-mean a{color:var(--link);text-decoration:none}
+.did-you-mean a:hover{text-decoration:underline}
+.dym-fix{font:italic 700 16px var(--font-body)}
+/* Plain text, not a link: it describes the search rather than offering one */
+.dym-instead{margin-top:3px;font-size:14px;color:var(--text-soft)}
+.dym-instead b{color:var(--text)}
 
 /* Two columns: capped results column left, source panel + knowledge panel
    right. Both top cells (AI Overview | sources) start the grid. */
@@ -350,7 +369,9 @@ h1,h2,h3,h4{margin:0;font-weight:400}
   margin-top:64px;background:#f2f2f2;border-top:1px solid var(--line);
   padding:15px 28px;font-size:14px;color:var(--text-faint);
 }
-.home-footer{position:fixed;left:0;right:0;bottom:0;margin-top:0}
+/* Last item in the home column, so it sits at the bottom of the viewport
+   without being fixed on top of the centred content */
+.home-footer{margin-top:0}
 
 /* ==========================================================================
    Responsive
@@ -382,9 +403,7 @@ h1,h2,h3,h4{margin:0;font-weight:400}
 }
 @media(max-width:700px){
   .header-icons{margin-left:auto}
-  .home-center{padding-top:6vh}
   .shortcuts{gap:8px 10px}
   .shortcut{width:82px}
   .result-thumb{flex-basis:76px;width:76px;height:76px}
-  .home-footer{position:static}
 }
